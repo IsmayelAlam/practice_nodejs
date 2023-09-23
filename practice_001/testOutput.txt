@@ -1,2 +1,2 @@
-this test is for writing on files.
- the input file includes: (this is a test file for input testing in node js.)
+asynchronous reading data.
+the input file includes: (this is a test file for input testing in node js.)
