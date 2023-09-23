@@ -16,9 +16,26 @@ fs.readFile("./testInput.txt", "utf-8", (err, data) =>
   )
 );
 */
-
 const server = http.createServer((req, res) => {
-  res.end("Hello world!");
+  const pathName = req.url;
+
+  switch (pathName) {
+    case "/":
+      res.writeHead(200, {
+        "Content-type": "text/html",
+        "test-Herder": "custom header",
+      });
+      res.end("<h1>Hello world!</h1>");
+      return;
+    case "/overview":
+      return res.end("<h1>overview</h1>");
+    case "/test":
+      return res.end("<h1>test</h1>");
+    case "/anotherTest":
+      return res.end("<h1>another test</h1>");
+    default:
+      return res.end("<h1>404|Page not found</h1>");
+  }
 });
 
 server.listen(3000, "localhost", () => console.log("server started"));
