@@ -1,5 +1,6 @@
 const fs = require("fs");
 const http = require("http");
+const URL = require("url");
 
 /*
 const testRead = fs.readFileSync("./testInput.txt", "utf-8");
@@ -16,6 +17,23 @@ fs.readFile("./testInput.txt", "utf-8", (err, data) =>
   )
 );
 */
+function replaceTemp(temp, product) {
+  let output = temp
+    .replace(/{%PRODUCTNAME%}/g, product.productName)
+    .replace(/{%IMAGES%}/g, product.image)
+    .replace(/{%QUANTITY%}/g, product.quantity)
+    .replace(/{%PRICE%}/g, product.price)
+    .replace(/{%LOCATION%}/g, product.from)
+    .replace(/{%NUTRIENTS%}/g, product.nutrients)
+    .replace(/{%DESCRIPTION%}/g, product.description)
+    .replace(/{%ID%}/g, product.id);
+
+  if (!product.organic)
+    output = output.replace(/{%NOT_ORGANIC%}/g, "not-organic");
+
+  return output;
+}
+
 const data = fs.readFileSync(`${__dirname}/test/data.json`, "utf-8");
 const overviewTemplate = fs.readFileSync(
   `${__dirname}/test/overviewTemplate.html`,
@@ -33,17 +51,29 @@ const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
   const pathName = req.url;
+  const { path, query } = URL.parse(req.url, true);
 
   switch (pathName) {
     case "/":
       res.writeHead(200, {
         "Content-type": "text/html",
       });
-      res.end(overviewTemplate);
+
+      const items = dataObj.map((item) => replaceTemp(cardTemplate, item));
+
+      res.end(overviewTemplate.replace("{%PRODUCTCARDS%}", items.join("")));
       return;
 
-    case "/product":
-      return res.end("<h1>test</h1>");
+    case path:
+      res.writeHead(200, {
+        "Content-type": "text/html",
+      });
+
+      const product = dataObj[query.id];
+      const output = replaceTemp(productTemplate, product);
+
+      res.end(output);
+      return;
 
     case "/API":
       res.writeHead(200, {
