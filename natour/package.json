@@ -4,7 +4,9 @@
   "description": "practice project",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "importData": "node dev-data/data/importDevData.js --import",
+    "deleteData": "node dev-data/data/importDevData.js --delete"
   },
   "author": "Ismayel alam",
   "license": "ISC",
