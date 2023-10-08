@@ -15,12 +15,16 @@ exports.getAllTours = async (req, res) => {
     let query = Tour.find(JSON.parse(queryStr));
     console.log(req.query.sort);
 
-    if (req.query.sort)
+    if (req.query.sort) {
       query = query.sort(
         req.query.sort.includes(",")
           ? req.query.sort.split(",").join(" ")
           : req.query.sort
       );
+    }
+    if (req.query.fields) {
+      query = query.select(req.query.fields.split(",").join(" "));
+    }
 
     const tours = await query;
     res
@@ -30,6 +34,7 @@ exports.getAllTours = async (req, res) => {
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
+
 exports.getTour = async (req, res) => {
   try {
     const tours = await Tour.findById(req.params.id);
@@ -38,6 +43,7 @@ exports.getTour = async (req, res) => {
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
+
 exports.createTour = async (req, res) => {
   try {
     const newTour = await Tour.create(req.body);
@@ -47,6 +53,7 @@ exports.createTour = async (req, res) => {
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
+
 exports.updateTour = async (req, res) => {
   try {
     const tours = await Tour.findByIdAndUpdate(req.params.id, req.body, {
@@ -57,6 +64,7 @@ exports.updateTour = async (req, res) => {
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
+
 exports.deleteTour = async (req, res) => {
   try {
     await Tour.findByIdAndDelete(req.params.id);
