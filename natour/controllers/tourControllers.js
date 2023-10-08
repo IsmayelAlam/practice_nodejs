@@ -7,14 +7,15 @@ exports.getAllTours = async (req, res) => {
 
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    // operators
     const queryStr = JSON.stringify(queryObj).replace(
       /\b(gte|gt|lte|lt)\b/g,
       (match) => `$${match}`
     );
 
     let query = Tour.find(JSON.parse(queryStr));
-    console.log(req.query.sort);
 
+    // sort
     if (req.query.sort) {
       query = query.sort(
         req.query.sort.includes(",")
@@ -22,8 +23,18 @@ exports.getAllTours = async (req, res) => {
           : req.query.sort
       );
     }
+    // limit fields
     if (req.query.fields) {
       query = query.select(req.query.fields.split(",").join(" "));
+    }
+    // pagination
+    if (req.query.page && req.query.limit) {
+      const skip = (+req.query.page - 1) * req.query.limit;
+      query = query.skip(skip).limit(+req.query.limit);
+
+      if (skip >= (await Tour.countDocuments())) {
+        throw new Error("page not available");
+      }
     }
 
     const tours = await query;
