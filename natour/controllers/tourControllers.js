@@ -12,7 +12,6 @@ exports.getAllTours = async (req, res) => {
     const tours = await feature.query;
     res.status(200).json({ status: "success", data: { tours } });
   } catch (error) {
-    console.log(error);
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
@@ -55,3 +54,72 @@ exports.deleteTour = async (req, res) => {
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: null,
+          avgRating: { $avg: "$ratingsAverage" },
+          numRating: { $sum: "$ratingsQuantity" },
+          numTours: { $sum: 1 },
+          avgPrice: { $avg: "$price" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+    ]);
+
+    res.status(200).json({ status: "success", data: { stats } });
+  } catch (error) {
+    res.status(400).json({ status: "fail", data: { message: error } });
+  }
+};
+
+exports.getMonthlyPlans = async (req, res) => {
+  try {
+    const year = +req.params.year;
+    const plan = await Tour.aggregate([
+      {
+        $unwind: "$startDates",
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$startDates" },
+          tourName: { $push: "$name" },
+          numTours: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: { month: "$_id" },
+      },
+      {
+        $project: { _id: 0 },
+      },
+      {
+        $sort: { numTours: -1 },
+      },
+      {
+        $limit: 5,
+      },
+    ]);
+
+    res.status(200).json({ status: "success", data: { plan } });
+  } catch (error) {
+    res.status(400).json({ status: "fail", data: { message: error } });
+  }
+};
+
+// tour-monthly-plans/2021
