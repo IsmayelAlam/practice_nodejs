@@ -1,47 +1,18 @@
 const Tour = require("../modals/tourModals");
+const APIFeatures = require("../utils/apiFeatures");
 
 exports.getAllTours = async (req, res) => {
   try {
-    const queryObj = { ...req.query };
-    const excludedFields = ["page", "sort", "limit", "fields"];
+    const feature = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .pagination();
 
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // operators
-    const queryStr = JSON.stringify(queryObj).replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
-    );
-
-    let query = Tour.find(JSON.parse(queryStr));
-
-    // sort
-    if (req.query.sort) {
-      query = query.sort(
-        req.query.sort.includes(",")
-          ? req.query.sort.split(",").join(" ")
-          : req.query.sort
-      );
-    }
-    // limit fields
-    if (req.query.fields) {
-      query = query.select(req.query.fields.split(",").join(" "));
-    }
-    // pagination
-    if (req.query.page && req.query.limit) {
-      const skip = (+req.query.page - 1) * req.query.limit;
-      query = query.skip(skip).limit(+req.query.limit);
-
-      if (skip >= (await Tour.countDocuments())) {
-        throw new Error("page not available");
-      }
-    }
-
-    const tours = await query;
-    res
-      .status(200)
-      .json({ status: "success", results: tours.length, data: { tours } });
+    const tours = await feature.query;
+    res.status(200).json({ status: "success", data: { tours } });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ status: "fail", data: { message: error } });
   }
 };
