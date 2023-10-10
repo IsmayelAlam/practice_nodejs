@@ -17,4 +17,10 @@ app.use((req, res, next) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tours", tourRoutes);
 
+app.all("*", (req, res) => {
+  res
+    .status(404)
+    .json({ status: "fail", message: `can't find ${req.originalUrl}` });
+});
+
 module.exports = app;
