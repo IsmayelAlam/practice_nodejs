@@ -31,7 +31,12 @@ const tourSchema = new mongoose.Schema({
     type: String,
     required: [true, "A tour needs difficulty"],
   },
-  discount: Number,
+  discount: {
+    type: Number,
+    validate: function (val) {
+      return val < this.price;
+    },
+  },
   summary: {
     type: String,
     trim: true,
@@ -51,6 +56,12 @@ const tourSchema = new mongoose.Schema({
     default: Date.now(),
   },
   startDates: [Date],
+});
+
+// doc middleware
+tourSchema.pre("save", function (next) {
+  console.log("pre");
+  next();
 });
 
 const Tour = mongoose.model("Tour", tourSchema);
