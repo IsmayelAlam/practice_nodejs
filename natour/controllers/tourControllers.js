@@ -12,13 +12,17 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
   const tours = await feature.query;
 
-  if (!tours.length) next(new AppError(`can't find any tours`, 404));
-
   res.status(200).json({ status: "success", data: { tours } });
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
   const tours = await Tour.findById(req.params.id);
+
+  if (!tours)
+    return next(
+      new AppError(`can't find any tours for: ${req.params.id}`, 404)
+    );
+
   res.status(200).json({ status: "success", data: { tours } });
 });
 
@@ -32,11 +36,21 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   const tours = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
+
+  if (!tours)
+    return next(
+      new AppError(`can't find any tours for: ${req.params.id}`, 404)
+    );
+
   res.status(200).json({ status: "success", data: { tours } });
 });
 
 exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  const tours = await Tour.findByIdAndDelete(req.params.id);
+  if (!tours)
+    return next(
+      new AppError(`can't find any tours for: ${req.params.id}`, 404)
+    );
   res.status(200).json({ status: "success", data: null });
 });
 
@@ -98,5 +112,3 @@ exports.getMonthlyPlans = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: "success", data: { plan } });
 });
-
-// tour-monthly-plans/2021
