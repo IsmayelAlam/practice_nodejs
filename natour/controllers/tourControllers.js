@@ -1,4 +1,4 @@
-const Tour = require("../modals/tourModals");
+const Tour = require("../models/tourModals");
 const APIFeatures = require("../utils/apiFeatures");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -17,6 +17,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 exports.getTour = catchAsync(async (req, res, next) => {
   const tours = await Tour.findById(req.params.id);
+  console.log(tours);
 
   if (!tours)
     return next(
@@ -35,6 +36,7 @@ exports.createTour = catchAsync(async (req, res, next) => {
 exports.updateTour = catchAsync(async (req, res, next) => {
   const tours = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
+    runValidators: true,
   });
 
   if (!tours)

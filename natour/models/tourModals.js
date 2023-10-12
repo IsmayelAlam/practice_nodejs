@@ -18,6 +18,7 @@ const tourSchema = new mongoose.Schema({
   ratingsAverage: {
     type: Number,
     default: 0,
+    max: 5,
   },
   ratingsQuantity: {
     type: Number,
