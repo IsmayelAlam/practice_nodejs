@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const { promisify } = require("util");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 var jwt = require("jsonwebtoken");
@@ -46,4 +47,27 @@ exports.login = catchAsync(async (req, res, next) => {
     status: "success",
     token,
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+  const err = new AppError("Please login to view", 401);
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) return next(err);
+
+  const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  const freshUser = await User.findById(decode.id);
+  if (!freshUser || freshUser.changedPasswordAfter(decode.iat))
+    return next(err);
+
+  req.user = freshUser;
+  next();
 });

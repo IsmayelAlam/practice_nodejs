@@ -17,6 +17,9 @@ module.exports = (err, req, res, next) => {
   if (err._message === "Validation failed") {
     error = handleValidationErrorDB(error);
   }
+  if (err.name === "JsonWebTokenError") {
+    error = handleTokenError(error);
+  }
 
   sendError(error, res);
 };
@@ -25,8 +28,8 @@ function sendError(err, res) {
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
+    error: err,
     // stack: err.stack,
-    // error: err,
   });
 }
 
@@ -45,4 +48,9 @@ function handleValidationErrorDB(err) {
   const message = `Invalid input: ${errors.join(" ")}`;
 
   return new AppError(message, 400);
+}
+function handleTokenError() {
+  const message = `Invalid token, please login again.`;
+
+  return new AppError(message, 401);
 }
