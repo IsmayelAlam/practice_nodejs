@@ -13,8 +13,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     // validate: [validator.isEmail, "please provide a valid email"],
-    match:
+    match: [
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+      "please provide a valid email",
+    ],
   },
   photo: String,
   password: {
