@@ -5,12 +5,16 @@ module.exports = (err, req, res, next) => {
 
   error.statusCode = err.statusCode || 500;
   error.status = err.status || "error";
+  error.message = err.message;
+  error.stack = err.stack;
 
   if (err.name === "CastError") {
     error = handleCastErrorDB(error);
-  } else if (err.code === 11000) {
+  }
+  if (err.code === 11000) {
     error = handleDuplicateErrorDB(error);
-  } else if (err._message === "Validation failed") {
+  }
+  if (err._message === "Validation failed") {
     error = handleValidationErrorDB(error);
   }
 
@@ -21,8 +25,8 @@ function sendError(err, res) {
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
-    stack: err.stack,
-    error: err,
+    // stack: err.stack,
+    // error: err,
   });
 }
 

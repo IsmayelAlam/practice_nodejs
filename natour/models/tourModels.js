@@ -61,7 +61,6 @@ const tourSchema = new mongoose.Schema({
 
 // doc middleware
 tourSchema.pre("save", function (next) {
-  console.log("pre");
   next();
 });
 
