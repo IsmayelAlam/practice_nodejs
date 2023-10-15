@@ -16,6 +16,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     photo: req.body.photo,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    role: req.body.role,
+    passwordChangesAt: req.body.passwordChangesAt,
   });
 
   const token = signTokens(newUser._id);
@@ -65,9 +67,21 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   const freshUser = await User.findById(decode.id);
-  if (!freshUser || freshUser.changedPasswordAfter(decode.iat))
-    return next(err);
+  if (!freshUser) return next(err);
 
   req.user = freshUser;
   next();
 });
+
+exports.restrictTo = (...role) => {
+  return catchAsync(async (req, res, next) => {
+    const err = new AppError(
+      "You don't have authorization to preform this action",
+      403
+    );
+
+    if (!role.includes(req.user.role)) return next(err);
+
+    next();
+  });
+};

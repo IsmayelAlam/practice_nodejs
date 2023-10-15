@@ -14,12 +14,13 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, "please provide a valid email"],
-    // match: [
-    //   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-    //   "please provide a valid email",
-    // ],
   },
   photo: String,
+  role: {
+    type: String,
+    default: "user",
+    enum: ["user", "guide", "lead-guide", "admin"],
+  },
   password: {
     type: String,
     required: [true, "A user needs password"],
