@@ -18,6 +18,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     role: req.body.role,
     passwordChangesAt: req.body.passwordChangesAt,
+    passwordResetToken: req.body.passwordResetToken,
+    passwordResetExpires: req.body.passwordResetExpires,
   });
 
   const token = signTokens(newUser._id);
@@ -67,7 +69,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   const freshUser = await User.findById(decode.id);
-  if (!freshUser) return next(err);
+  if (!freshUser || freshUser.changedPasswordAfter(decode.iat))
+    return next(err);
 
   req.user = freshUser;
   next();
@@ -85,3 +88,16 @@ exports.restrictTo = (...role) => {
     next();
   });
 };
+
+exports.forgetPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  const err = new AppError("There is no user with this email", 404);
+  if (!user) return next(err);
+
+  const resetToken = user.createPasswordResetToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  next();
+});
