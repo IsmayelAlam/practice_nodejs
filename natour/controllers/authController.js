@@ -11,6 +11,14 @@ const signTokens = (id) =>
     expiresIn: process.env.JWT_EXPIRES,
   });
 
+function sendToken(id, statusCode, res) {
+  const token = signTokens(id);
+  return res.status(statusCode).json({
+    status: "success",
+    token,
+  });
+}
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -47,12 +55,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(err);
   }
 
-  const token = signTokens(user._id);
-
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  sendToken(user._id, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -153,9 +156,19 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  const token = signTokens(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  sendToken(user._id, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const err = new AppError("Invalid password", 400);
+
+  const user = await User.findById(req.user.id).select("+password");
+  if (!user.correctPassword(req.body.passwordCurrent, user.password))
+    return next(err);
+
+  user.password = req.body.newPassword;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  sendToken(user._id, 200, res);
 });
