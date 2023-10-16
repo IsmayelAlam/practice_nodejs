@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 const dotenv = require("dotenv");
 const Tour = require("../../models/tourModels");
+const User = require("../../models/userModel");
 
 dotenv.config({ path: "./.env.local" });
 
