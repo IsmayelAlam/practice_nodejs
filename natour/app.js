@@ -6,7 +6,8 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const tourRoutes = require("./routes/tourRoutes");
-const userRouter = require("./routes/userRouter");
+const userRouters = require("./routes/userRouters");
+const reviewRoutes = require("./routes/reviewRoutes");
 const AppError = require("./utils/appError");
 const errorController = require("./controllers/errorController");
 
@@ -44,8 +45,9 @@ app.use(
   })
 );
 
-app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tours", tourRoutes);
+app.use("/api/v1/users", userRouters);
+app.use("/api/v1/reviews", reviewRoutes);
 
 app.all("*", (req, res, next) => {
   const err = new AppError(`can't find ${req.originalUrl}`, 404);
