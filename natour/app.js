@@ -1,5 +1,6 @@
 const express = require("express");
 const morgen = require("morgan");
+const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const tourRoutes = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRouter");
@@ -7,6 +8,7 @@ const AppError = require("./utils/appError");
 const errorController = require("./controllers/errorController");
 
 const app = express();
+app.use(helmet());
 
 // app.use(morgen("dev"));
 
@@ -17,7 +19,7 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toDateString();
