@@ -13,7 +13,7 @@ const errorController = require("./controllers/errorController");
 const app = express();
 app.use(helmet());
 
-// app.use(morgen("dev"));
+app.use(morgen("dev"));
 
 const limiter = rateLimit({
   max: 20,
