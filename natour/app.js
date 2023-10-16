@@ -1,5 +1,6 @@
 const express = require("express");
 const morgen = require("morgan");
+const rateLimit = require("express-rate-limit");
 const tourRoutes = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRouter");
 const AppError = require("./utils/appError");
@@ -7,7 +8,14 @@ const errorController = require("./controllers/errorController");
 
 const app = express();
 
-app.use(morgen("dev"));
+// app.use(morgen("dev"));
+
+const limiter = rateLimit({
+  max: 20,
+  windowMs: 60 * 60 * 100,
+  message: "Too many request from same IP",
+});
+app.use("/api", limiter);
 
 app.use(express.json());
 
