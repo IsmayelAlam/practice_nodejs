@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const catchAsync = require("../utils/catchAsync");
 
 function filterObj(obj, ...allowed) {
   const newObj = {};

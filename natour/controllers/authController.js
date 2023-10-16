@@ -11,8 +11,19 @@ const signTokens = (id) =>
     expiresIn: process.env.JWT_EXPIRES,
   });
 
-function sendToken(id, statusCode, res) {
-  const token = signTokens(id);
+function sendToken(user, statusCode, res) {
+  const token = signTokens(user._id);
+
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
+    ),
+    secure: true,
+    httpOnly: true,
+  });
+
+  user.password = undefined;
+
   return res.status(statusCode).json({
     status: "success",
     token,
@@ -55,7 +66,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(err);
   }
 
-  sendToken(user._id, 200, res);
+  sendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -156,7 +167,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  sendToken(user._id, 200, res);
+  sendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -170,5 +181,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
 
-  sendToken(user._id, 200, res);
+  sendToken(user, 200, res);
 });
