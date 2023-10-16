@@ -4,6 +4,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
 const tourRoutes = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRouter");
 const AppError = require("./utils/appError");
@@ -30,6 +31,18 @@ app.use((req, res, next) => {
 
 app.use(mongoSanitize());
 app.use(xss());
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "ratingsAverage",
+      "ratingsQuantity",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tours", tourRoutes);
