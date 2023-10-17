@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "importData": "node dev-data/data/importDevData.js --import",
-    "deleteData": "node dev-data/data/importDevData.js --delete"
+    "importData": "node testData/data/importDevData.js --import",
+    "deleteData": "node testData/data/importDevData.js --delete"
   },
   "author": "Ismayel alam",
   "license": "ISC",
