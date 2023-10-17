@@ -1,5 +1,11 @@
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
+const { deleteOne, updateOne, getOne, getAll } = require("./handlerFactory");
+
+exports.getAllUsers = getAll(User);
+exports.getUsers = getOne(User);
+exports.updateUsers = updateOne(User);
+exports.deleteUsers = deleteOne(User);
 
 function filterObj(obj, ...allowed) {
   const newObj = {};
@@ -8,11 +14,6 @@ function filterObj(obj, ...allowed) {
   });
   return newObj;
 }
-
-exports.getAllUsers = (req, res) => {};
-exports.addNewUsers = (req, res) => {};
-exports.getUsers = (req, res) => {};
-exports.updateUsers = (req, res) => {};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const err = new AppError("Password is not valid for this route", 400);
@@ -41,5 +42,3 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
-
-exports.deleteUsers = (req, res) => {};

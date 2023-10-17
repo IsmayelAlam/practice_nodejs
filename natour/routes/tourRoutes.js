@@ -1,6 +1,6 @@
 const express = require("express");
-const reviewRoutes = require("./reviewRoutes");
 
+const reviewRoutes = require("./reviewRoutes");
 const {
   getAllTours,
   createTour,
