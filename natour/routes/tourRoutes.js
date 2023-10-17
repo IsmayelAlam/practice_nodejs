@@ -1,4 +1,6 @@
 const express = require("express");
+const reviewRoutes = require("./reviewRoutes");
+
 const {
   getAllTours,
   createTour,
@@ -23,5 +25,11 @@ router
   .get(getTour)
   .patch(updateTour)
   .delete(protect, restrictTo("admin", "lead-guide"), deleteTour);
+
+// router
+//   .route("/:tourId/reviews")
+//   .post(protect, restrictTo("user"), createReviews);
+
+router.use("/:tourId/reviews", reviewRoutes);
 
 module.exports = router;
