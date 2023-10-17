@@ -3,7 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const { deleteOne, updateOne, getOne, getAll } = require("./handlerFactory");
 
 exports.getAllUsers = getAll(User);
-exports.getUsers = getOne(User);
+exports.getUser = getOne(User);
 exports.updateUsers = updateOne(User);
 exports.deleteUsers = deleteOne(User);
 
@@ -14,6 +14,11 @@ function filterObj(obj, ...allowed) {
   });
   return newObj;
 }
+
+exports.getMe = catchAsync(async (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+});
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const err = new AppError("Password is not valid for this route", 400);

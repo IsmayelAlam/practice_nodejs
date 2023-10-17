@@ -8,7 +8,7 @@ const {
 } = require("./handlerFactory");
 
 exports.getAllReviews = getAll(Review);
-exports.getReviews = getOne(Review);
+exports.getReview = getOne(Review);
 exports.createReviews = createOne(Review);
 exports.updateReview = updateOne(Review);
 exports.deleteReview = deleteOne(Review);
