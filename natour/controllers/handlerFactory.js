@@ -15,7 +15,9 @@ exports.getAll = (model) =>
 
     const docs = await feature.query;
 
-    res.status(200).json({ status: "success", data: { docs } });
+    res
+      .status(200)
+      .json({ status: "success", results: docs.length, data: { docs } });
   });
 
 exports.getOne = (model, populateOpt) =>
