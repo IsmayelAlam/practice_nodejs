@@ -6,6 +6,8 @@ const xss = require("xss-clean");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
+const cookieParser = require("cookie-parser");
+
 const tourRoutes = require("./routes/tourRoutes");
 const userRouters = require("./routes/userRouters");
 const reviewRoutes = require("./routes/reviewRoutes");
@@ -30,6 +32,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, "public")));
 
